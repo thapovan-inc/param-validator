@@ -48,29 +48,24 @@ func (val *Validation) Apply(jsonValue map[string]interface{}) (bool, error) {
 		}
 		return true, nil
 
-	} else {
-		if val.Type == NULL {
-			if value == nil {
-				return true, nil
-			}
-			return false, errors.New("Null value in " + val.FieldName)
-
-		} else {
-			if val.Type == ANY {
-				return checkValidation(value, val)
-			}
-			if value == nil {
-				return false, errors.New("Null value in " + val.FieldName)
-			}
-			typeResult, err := checkType(value, val)
-			if typeResult {
-				return checkValidation(value, val)
-			}
-			return false, err
-
-		}
 	}
-
+	if val.Type == NULL {
+		if value == nil {
+			return true, nil
+		}
+		return false, errors.New("Null value in " + val.FieldName)
+	}
+	if val.Type == ANY {
+		return checkValidation(value, val)
+	}
+	if value == nil {
+		return false, errors.New("Null value in " + val.FieldName)
+	}
+	typeResult, err := checkType(value, val)
+	if typeResult {
+		return checkValidation(value, val)
+	}
+	return false, err
 }
 
 func checkType(v interface{}, val *Validation) (bool, error) {
@@ -120,10 +115,6 @@ func checkType(v interface{}, val *Validation) (bool, error) {
 		}
 
 	}
-	//print("Expected "+ typeString +" but found an ")
-	//fmt.Printf("%v", reflect.TypeOf(v).Kind())
-	//println("  ")
-	//print("===================")
 	return false, errors.New("Expected " + typeString + " but found an " + fmt.Sprintf("%v", reflect.TypeOf(v).Kind()))
 }
 
