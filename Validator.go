@@ -35,43 +35,42 @@ type Validation struct {
 	CustomValidator Validator
 }
 
+//Validation Function
 func (val *Validation) Apply(jsonValue map[string]interface{}) (bool, error) {
 
 	if val.FieldName == "" {
 		return false, errors.New("Empty Field Name")
+	}
+	value, present := jsonValue[val.FieldName]
+	if !present {
+		if val.Required {
+			return false, errors.New("Required field " + val.FieldName + " is missing")
+		}
+		return true, nil
+
 	} else {
-		value, present := jsonValue[val.FieldName]
-		if !present {
-			if val.Required {
-				return false, errors.New("Required field " + val.FieldName + " is missing")
-			} else {
+		if val.Type == NULL {
+			if value == nil {
 				return true, nil
 			}
-		} else {
-			if val.Type == NULL {
-				if value == nil {
-					return true, nil
-				} else {
-					return false, errors.New("Null value in " + val.FieldName)
-				}
-			} else {
-				if val.Type == ANY {
-					return checkValidation(value, val)
-				} else {
+			return false, errors.New("Null value in " + val.FieldName)
 
-					if value == nil {
-						return false, errors.New("Null value in " + val.FieldName)
-					}
-					typeResult, err := checkType(value, val)
-					if typeResult {
-						return checkValidation(value, val)
-					} else {
-						return false, err
-					}
-				}
+		} else {
+			if val.Type == ANY {
+				return checkValidation(value, val)
 			}
+			if value == nil {
+				return false, errors.New("Null value in " + val.FieldName)
+			}
+			typeResult, err := checkType(value, val)
+			if typeResult {
+				return checkValidation(value, val)
+			}
+			return false, err
+
 		}
 	}
+
 }
 
 func checkType(v interface{}, val *Validation) (bool, error) {
@@ -131,7 +130,7 @@ func checkType(v interface{}, val *Validation) (bool, error) {
 func checkValidation(v interface{}, val *Validation) (bool, error) {
 	if val.CustomValidator == nil {
 		return true, nil
-	} else {
-		return val.CustomValidator(v)
 	}
+	return val.CustomValidator(v)
+
 }
