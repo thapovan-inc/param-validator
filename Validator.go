@@ -35,7 +35,7 @@ type Validation struct {
 	CustomValidator Validator
 }
 
-//Validation Function
+//Apply the Validation structure
 func (val *Validation) Apply(jsonValue map[string]interface{}) (bool, error) {
 
 	if val.FieldName == "" {
