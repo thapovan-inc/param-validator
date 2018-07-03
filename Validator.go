@@ -1,10 +1,10 @@
-package param_validator
+package paramValidator
 
 import (
 	"errors"
-	"reflect"
-	"math"
 	"fmt"
+	"math"
+	"reflect"
 )
 
 // DataType - Enumeration type for JSON types
@@ -43,7 +43,7 @@ func (val *Validation) Apply(jsonValue map[string]interface{}) (bool, error) {
 		value, present := jsonValue[val.FieldName]
 		if !present {
 			if val.Required {
-				return false, errors.New("Required field "+ val.FieldName+ " is missing")
+				return false, errors.New("Required field " + val.FieldName + " is missing")
 			} else {
 				return true, nil
 			}
@@ -52,7 +52,7 @@ func (val *Validation) Apply(jsonValue map[string]interface{}) (bool, error) {
 				if value == nil {
 					return true, nil
 				} else {
-					return false, errors.New("Null value in "+val.FieldName)
+					return false, errors.New("Null value in " + val.FieldName)
 				}
 			} else {
 				if val.Type == ANY {
@@ -60,7 +60,7 @@ func (val *Validation) Apply(jsonValue map[string]interface{}) (bool, error) {
 				} else {
 
 					if value == nil {
-						return false, errors.New("Null value in "+val.FieldName)
+						return false, errors.New("Null value in " + val.FieldName)
 					}
 					typeResult, err := checkType(value, val)
 					if typeResult {
@@ -125,8 +125,7 @@ func checkType(v interface{}, val *Validation) (bool, error) {
 	//fmt.Printf("%v", reflect.TypeOf(v).Kind())
 	//println("  ")
 	//print("===================")
-	return false, errors.New("Expected "+ typeString + " but found an " + fmt.Sprintf("%v", reflect.TypeOf(v).Kind()))
-
+	return false, errors.New("Expected " + typeString + " but found an " + fmt.Sprintf("%v", reflect.TypeOf(v).Kind()))
 }
 
 func checkValidation(v interface{}, val *Validation) (bool, error) {
