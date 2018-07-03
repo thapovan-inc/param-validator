@@ -1,8 +1,7 @@
-package param_validator
+package paramValidator
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"math"
 	"reflect"
@@ -26,7 +25,7 @@ const testJSON0 = `{
 
 func Test_Required(t *testing.T) {
 	var jsonValue = make(map[string]interface{})
-	err := json.Unmarshal([]byte(testJSON0), &jsonValue)
+	_ = json.Unmarshal([]byte(testJSON0), &jsonValue)
 	requiredValidator0 := Validation{
 		FieldName: "field_num",
 		Required:  true,
@@ -130,14 +129,14 @@ func Test_DataTypeNumber(t *testing.T) {
 		CustomValidator: func(i interface{}) (bool, error) {
 
 			if reflect.TypeOf(i).Kind() != reflect.Float64 && !(i.(float64) == math.Trunc(i.(float64))) {
-				return false, errors.New(fmt.Sprintf("Expecting integer data type found %T", i))
+				return false, fmt.Errorf("Expecting integer data type found %T", i)
 			}
 			value := int(math.Trunc(i.(float64)))
 			if value < 0 {
 				return true, nil
-			} else {
-				return false, errors.New(fmt.Sprintf("Expecting a negative value found %d", value))
 			}
+			return false, fmt.Errorf("Expecting a negative value found %d", value)
+
 		},
 	}
 	result2, err := requiredValidator2.Apply(jsonValue)
